@@ -1,0 +1,29 @@
+:root {
+    --danger: #f08e96;
+    --glass: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    margin: 0; font-family: sans-serif; background: #0f172a; color: white;
+    display: flex; justify-content: center; align-items: center; min-height: 100vh;
+}
+
+.app-container {
+    width: 90%; max-width: 380px; background: #1e293b; border-radius: 40px;
+    padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.custom-select-container { position: relative; margin-bottom: 20px; }
+.select-selected { background: var(--glass); border: 1px solid var(--glass-border); padding: 12px; border-radius: 15px; cursor: pointer; }
+.select-items { position: absolute; background: #1e293b; top: 110%; left: 0; right: 0; border-radius: 15px; max-height: 250px; overflow-y: auto; z-index: 10; border: 1px solid var(--glass-border); }
+.select-hide { display: none; }
+.select-items div { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: left; cursor: pointer; }
+.select-items div:hover { background: var(--danger); }
+
+#temperature { font-size: 4rem; margin: 10px 0; }
+#weather-icon { font-size: 60px; }
+.threat-line { margin: 20px 0; padding: 15px; border-top: 1px solid var(--glass-border); min-height: 50px; }
+#threat-text { color: var(--danger); font-style: italic; }
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.detail-card { background: var(--glass); padding: 10px; border-radius: 15px; }
