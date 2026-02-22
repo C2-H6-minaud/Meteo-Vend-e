@@ -5,34 +5,17 @@ const depts = {
 };
 
 const lexiqueConditions = {
-    'Clear': "Grand Soulail",
-    'Rain': "Ça moulle dur",
-    'Drizzle': "Ça fouine dehors",
-    'Clouds': "Y'a point de soulail",
-    'Thunderstorm': "Orage",
-    'Snow': "Y'a du Fré et de la neige"
+    'Clear': "Grand Soulail", 'Rain': "Ça moulle dur", 'Drizzle': "Ça fouine dehors",
+    'Clouds': "Y'a point de soulail", 'Thunderstorm': "Orage", 'Snow': "Y'a du Fré et de la neige"
 };
 
 const threats = {
-    'Clear': [
-        "V'là le Soulail !",
-        "O fét un biau temps !",
-    ],
-    'Rain': [
-        "O moille, on va êt'tout guenés.",
-    ],
-    'Drizzle': [
-        "O guenasse un p'tit peu.",
-    ],
-    'Thunderstorm': [
-        "Le tounnâ s'en vient, o va touner !"
-    ],
-    'Snow': [
-        "Quel Fré... Couvre-toi !"
-    ],
-    'Clouds': [
-        "O s'abernzit, le temps est grisoux.",
-    ]
+    'Clear': ["V'là le Soulail !", "O fét un biau temps !"],
+    'Rain': ["O moille, on va êt'tout guenés."],
+    'Drizzle': ["O guenasse un p'tit peu."],
+    'Thunderstorm': ["Le tounnâ s'en vient, o va touner !"],
+    'Snow': ["Quel Fré... Couvre-toi !"],
+    'Clouds': ["O s'abernzit, le temps est grisoux."]
 };
 
 const icons = { 'Clear': '☀️', 'Clouds': '☁️', 'Rain': '🌧️', 'Thunderstorm': '⛈️', 'Snow': '❄️', 'Mist': '🌫️', 'Drizzle': '🌦️' };
@@ -43,6 +26,23 @@ const optionsList = document.getElementById('options-list');
 document.getElementById('date').innerText = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 
 function init() {
+    // 1. On récupère la dernière ville choisie
+    const lastCity = localStorage.getItem('selectedCity') || "Vendée";
+
+    // 2. On cherche le code du département correspondant pour mettre à jour l'affichage
+    // On parcourt l'objet depts pour trouver la clé (code) qui correspond au nom (city)
+    let displayCode = "85"; // Valeur par défaut
+    for (let code in depts) {
+        if (depts[code] === lastCity) {
+            displayCode = code;
+            break;
+        }
+    }
+
+    // 3. On met à jour le texte du sélecteur au démarrage
+    selectedBox.querySelector('span').innerText = `${displayCode} - ${lastCity}`;
+
+    // 4. On crée la liste des options
     for (let code in depts) {
         let div = document.createElement('div');
         div.innerText = `${code} - ${depts[code]}`;
@@ -53,16 +53,18 @@ function init() {
         };
         optionsList.appendChild(div);
     }
-    fetchWeather("Vendée"); // Lancement par défaut sur la Vendée
+
+    // 5. On lance la météo
+    fetchWeather(lastCity);
 }
 
 async function fetchWeather(city) {
+    localStorage.setItem('selectedCity', city); // On garde en mémoire pour la page prévision
     try {
         const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},FR&units=metric&lang=fr&appid=${API_KEY}`);
         const data = await res.json();
         const main = data.weather[0].main;
 
-        // Si la température est basse (ex: < 5°C), on force le terme "Fré"
         const temp = Math.round(data.main.temp);
         const conditionText = temp < 5 ? `Y'a du Fré (${temp}°C)` : (lexiqueConditions[main] || data.weather[0].description);
 
@@ -75,11 +77,16 @@ async function fetchWeather(city) {
         const sayings = threats[main] || ["Je te surveille, mon gâs."];
         document.getElementById('threat-text').innerText = sayings[Math.floor(Math.random() * sayings.length)];
     } catch (e) {
-        document.getElementById('threat-text').innerText = "Erreur de connexion. Ta clé API met du temps à chauffer !";
+        document.getElementById('threat-text').innerText = "Erreur de connexion.";
     }
 }
 
 selectedBox.onclick = (e) => { e.stopPropagation(); optionsList.classList.toggle('select-hide'); };
 document.onclick = () => { optionsList.classList.add('select-hide'); };
+
+// Action du bouton prévisions
+document.getElementById('btn-forecast').onclick = () => {
+    window.location.href = "forecast.html";
+};
 
 init();
